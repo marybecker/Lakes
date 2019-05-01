@@ -1,4 +1,4 @@
-setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes")
+setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -12,6 +12,9 @@ library(png)
 ##Read in Lakes Chem and Secchi data
 lakes<-read.csv("data/LakeData17.csv",header=TRUE)
 lakespoly<-read_sf("data/nla_lakes17.geojson")
+lakespts<-read_sf("data/nla_lakes17.geojson")
+cttownspoly<-read_sf("data/CTTowns.geojson")
+
 
 ##Calculate Trophic Score for Each Parameter (TP, TN, Chlor a, Transparency)
 lakes$TPCAT<-ifelse(lakes$Phosphorus<=0.010,1,
@@ -57,20 +60,24 @@ for (i in 1:dim(lakes)[1]){
 l<- lakes[i,]
 
 ##Parse out the lake data that you are interested in
-lakemapdata<-lakespoly[lakespoly$STA_SEQ==l$STA_SEQ,]
+lakemappoly<-lakespoly[lakespoly$STA_SEQ==l$STA_SEQ,]
+lakemappt<-lakespts[lakespts$STA_SEQ==l$STA_SEQ,]
 
 ##Make a map of the parsed lake data
-lakemap<-ggplot(lakemapdata)+
-  geom_sf(colour="deepskyblue1",fill="midnightblue")+
-  theme(panel.background=element_rect(fill="grey12",color="grey50"),
-        panel.grid=element_blank(),
-        axis.text=element_text(size=6))
+smap<-  tm_shape(cttownspoly)+
+          tm_polygons(col="gray",border.col="white",lwd=2)+
+        tm_shape(lakemappt)+
+          tm_symbols(col="black")+
+        tm_layout(bg.color="midnightblue")
+lmap<-  tm_shape(lakemappoly)+
+          tm_polygons(col="deepskyblue1",border.col="white",lwd=3,border.alpha=0.7)+
+        tm_shape(lakemappt)+
+          tm_symbols(col="black")+
+        tm_layout(bg.color="midnightblue")
 
+wmap<-tmap_arrange(smap,lmap)
 
-imgfile<-paste0("data/",l$STA_SEQ,".png")
-imgfile<-ifelse(file.exists(paste0("data/",l$STA_SEQ,".png"))==FALSE,
-                        "data/nolakepic.png",paste0("data/",l$STA_SEQ,".png"))
-img1<-readPNG(imgfile)
+tmap_save(wmap,paste0(i,"lake.png"),width=600,height=400,dpi=72)
 
 gradient<-data.frame(x=c(0,1,2,3,4,5,6,7),
                      y=c(1,1,1,1,1,1,1,1),
@@ -161,23 +168,9 @@ p5<-  ggplot()+
 
 
 
-title <- textGrob(paste(l$Lake,"SID:",l$STA_SEQ,"Lake Assessment Summary",l$SampleDate),
-                  gp=gpar(fontsize=14,fontface="bold", col="black"))#1
+
 tcat<-textGrob(paste("Trophic Category:",l$Trophic),
-               gp=gpar(fontsize=14,fontface="bold.italic", col="black"))#21
-map<-lakemap#2
-lakeimg1<-rasterGrob(img1)#3
-infojust<-0
-posx<-0.2
-posy<-1
-background<-textGrob("Lake Information",posx,posy,just=infojust,
-                     gp=gpar(fontsize=12,fontface="bold"))#4
-location<-textGrob("Town: Town Name",posx,posy,just=infojust)#5
-WArea<-textGrob(paste("Watershed Area (sq km):",lakemapdata$AreaSqKm),posx,posy,just=infojust)#6
-LArea<-textGrob(paste("Lake Area (sq mi):",lakemapdata$LASqMI),posx,posy,just=infojust)#7
-Slen<-textGrob(paste("Shore Perimeter (mi):",lakemapdata$PerMI),posx,posy,just=infojust)#8
-Elevation<-textGrob(paste("Elevation (m)"),posx,posy,just=infojust)#9,
-ldepth<-textGrob("Lake Depth",posx,posy,just=infojust)#10
+               gp=gpar(fontsize=20,fontface="bold", col="black"))#21
 ptjust<-"left"
 ptposx<-0.2
 ptposy<-0.5
@@ -187,44 +180,40 @@ p3t<-textGrob("Total Nitrogen",just=ptjust,ptposx,ptposy)#15-16
 p4t<-textGrob("Chlorophyll-a",just=ptjust,ptposx,ptposy)#17-18
 p5t<-textGrob("Transparency",just=ptjust,ptposx,ptposy)#19-20
 
-lay<-rbind(c(1,1,21),
+lay<-rbind(c(1,NA,NA),
            c(NA,NA,NA),
-           c(2,3,4),
-           c(2,3,5),
-           c(2,3,6),
-           c(2,3,7),
-           c(2,3,8),
-           c(2,3,9),
-           c(2,3,10),
-           c(2,3,10),
-           c(2,3,NA),
-           c(11,NA,NA),
-           c(12,12,12),
-           c(13,NA,NA),
-           c(14,14,14),
-           c(15,NA,NA),
-           c(16,16,16),
-           c(17,NA,NA),
-           c(18,18,18),
-           c(19,NA,NA),
-           c(20,20,20))
+           c(2,NA,NA),
+           c(3,3,3),
+           c(4,NA,NA),
+           c(5,5,5),
+           c(6,NA,NA),
+           c(7,7,7),
+           c(8,NA,NA),
+           c(9,9,9),
+           c(10,NA,NA),
+           c(11,11,11))
 
-laketest<-grid.arrange(title,map,lakeimg1,
-                       background,location,Slen,WArea,LArea,Elevation,ldepth,
-                       p1t,p1,p2t,p2,p3t,p3,p4t,p4,p5t,p5,tcat,
-                       ncol=2,layout_matrix=lay,
-                       heights=unit(c(0.25,0.25,0.25,0.25,0.25,0.25,0.25,0.25,
-                                      0.25,0.25,1.5,0.25,0.5,0.25,0.5,0.25,
+laketest<-grid.arrange(tcat,
+                       p1t,p1,p2t,p2,p3t,p3,p4t,p4,p5t,p5,
+                       ncol=1,layout_matrix=lay,
+                       heights=unit(c(0.25,0.25,0.25,0.5,0.25,0.5,0.25,
                                       0.5,0.25,0.5,0.25,0.5),
-                                    c("in","in","in","in","in","in","in",
-                                      "in","in","in","in","in","in","in",
-                                      "in","in","in","in","in","in","in")))
+                                    c("in","in","in","in","in","in","in","in",
+                                      "in","in","in","in")),
+                       )
 laketest
 
-ggsave(paste0(i,".png"),laketest,width=11,height=8,units="in",dpi=72)
+ggsave(paste0(i,".png"),laketest,width=15,height=5,units="in",dpi=72)
 
 }
 
-
+background<-textGrob("Lake Information",posx,posy,just=infojust,
+                     gp=gpar(fontsize=12,fontface="bold"))#4
+location<-textGrob("Town: Town Name",posx,posy,just=infojust)#5
+WArea<-textGrob(paste("Watershed Area (sq km):",lakemapdata$AreaSqKm),posx,posy,just=infojust)#6
+LArea<-textGrob(paste("Lake Area (sq mi):",lakemapdata$LASqMI),posx,posy,just=infojust)#7
+Slen<-textGrob(paste("Shore Perimeter (mi):",lakemapdata$PerMI),posx,posy,just=infojust)#8
+Elevation<-textGrob(paste("Elevation (m)"),posx,posy,just=infojust)#9,
+ldepth<-textGrob("Lake Depth",posx,posy,just=infojust)#10
 
 

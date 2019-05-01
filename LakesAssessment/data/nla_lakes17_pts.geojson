@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "nla_lakes17_pts",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::6433" } },
+"features": [
+{ "type": "Feature", "properties": { "Lake": "Billings Lake", "STA_SEQ": 19304, "YLat": 41.508, "XLong": -71.875 }, "geometry": { "type": "Point", "coordinates": [ 377848.292727, 227697.406524 ] } },
+{ "type": "Feature", "properties": { "Lake": "Bissonnette Pond", "STA_SEQ": 16181, "YLat": 41.922621, "XLong": -72.219298 }, "geometry": { "type": "Point", "coordinates": [ 348822.8967, 273513.327025 ] } },
+{ "type": "Feature", "properties": { "Lake": "Bissonnette Pond", "STA_SEQ": 16181, "YLat": 41.922621, "XLong": -72.219298 }, "geometry": { "type": "Point", "coordinates": [ 348822.8967, 273513.327025 ] } },
+{ "type": "Feature", "properties": { "Lake": "Deep Lake", "STA_SEQ": 19760, "YLat": 41.950671, "XLong": -73.465605 }, "geometry": { "type": "Point", "coordinates": [ 245466.531361, 276739.424523 ] } },
+{ "type": "Feature", "properties": { "Lake": "Grays Pond", "STA_SEQ": 19939, "YLat": 41.139, "XLong": -73.62286 }, "geometry": { "type": "Point", "coordinates": [ 231517.623983, 186716.835294 ] } },
+{ "type": "Feature", "properties": { "Lake": "Halls Pond - Eastford", "STA_SEQ": 16150, "YLat": 41.843286, "XLong": -72.108528 }, "geometry": { "type": "Point", "coordinates": [ 358076.643953, 264764.056669 ] } },
+{ "type": "Feature", "properties": { "Lake": "Halls Pond - Willington", "STA_SEQ": 19803, "YLat": 41.857094, "XLong": -72.298297 }, "geometry": { "type": "Point", "coordinates": [ 342307.957277, 266197.998742 ] } },
+{ "type": "Feature", "properties": { "Lake": "Lake Zoar", "STA_SEQ": 16188, "YLat": 41.387, "XLong": -73.176 }, "geometry": { "type": "Point", "coordinates": [ 269170.109878, 213977.029109 ] } },
+{ "type": "Feature", "properties": { "Lake": "Morris Reservoir", "STA_SEQ": 18374, "YLat": 41.67644, "XLong": -73.14487 }, "geometry": { "type": "Point", "coordinates": [ 271920.689408, 246110.240472 ] } },
+{ "type": "Feature", "properties": { "Lake": "Riga Lake", "STA_SEQ": 15864, "YLat": 42.021, "XLong": -73.4816 }, "geometry": { "type": "Point", "coordinates": [ 244206.481679, 284562.015597 ] } },
+{ "type": "Feature", "properties": { "Lake": "West Hill Pond", "STA_SEQ": 16165, "YLat": 41.877022, "XLong": -73.043053 }, "geometry": { "type": "Point", "coordinates": [ 280474.27342, 268354.633209 ] } }
+]
+}

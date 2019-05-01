@@ -8,14 +8,14 @@
 		
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/white.css">
+		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
 		<div class="reveal">
 			<div class="slides">
 				<!--Start slides - Slide 1 -->	
-				<section>
-					<h2>LAKES REPORT DEMO</h2>
-					<p><img src="LakesAssessment/RigaLake.png" style ="width:600px;height:400px"></p>
+				<section data-background-image="LakesAssessment/RigaLake.png" data-background-opacity=0.8>
+					<h1>LAKES REPORT DEMO</h1>
 				</section>
 				<!--How to use reveal slides -->	
 				<section>
@@ -24,10 +24,24 @@
 					<p>Press the down arrow for additional lake information
 					<img src="LakesAssessment/downarrow.png" alt="Lake Data"></p>
 				</section>
+				<section>
+					<a href="#/Lake 2">Lake 2</a>
+				</section>
 				<!--Next Slide with 'more info' demo -->
 				<section>
-					<section>
-						<img src="LakesAssessment/1.png" alt="Lake Data">
+					<section data-background-image="LakesAssessment/data/15864.png" data-background-opacity=0.5>
+						<div id="left">
+							<p style="text-align:left;">Billings Lake SID: 19304 Lake Assessment 2017</p>
+							<b>Lake Information</b>
+							<ul style=font-size:medium;>
+								Town:  Town Name
+								Shore Perimeter:  ?
+								Watershed Area: SqMi
+							</ul>
+						</div>
+						<div id="right"><img src="LakesAssessment/1lake.png" alt="Lake Data">
+						</div>
+						<img src="LakesAssessment/1.png" alt="Lake Data" style="opacity-0.8">
 					</section>
 					<section>
 						<h2>Add DO profile here</h2>
@@ -38,7 +52,7 @@
 				</section>
 				<!--Next Slide with 'more info' demo -->
 				<section>
-					<section>
+					<section id="Lake 2">
 						<img src="LakesAssessment/2.png" alt="Lake Data">
 					</section>
 					<section>
