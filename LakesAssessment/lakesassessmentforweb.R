@@ -1,4 +1,4 @@
-setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
+setwd("P:/Projects/GitHub_Prj/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -7,13 +7,35 @@ library(rgdal)
 library(sp)
 library(sf)
 library(png)
+library(tmap)
+library(dplyr)
 
 
 ##Read in Lakes Chem and Secchi data
-lakes<-read.csv("data/LakeData17.csv",header=TRUE)
-lakespoly<-read_sf("data/nla_lakes17.geojson")
-lakespts<-read_sf("data/nla_lakes17.geojson")
+lakes<-read.csv("data/lakedata14_16.csv",header=TRUE)
+lakespoly<-read_sf("data/Lake_Site_Poly_12_17.geojson")
+lakespts<-read_sf("data/Lake_Site_Point_12_17.geojson")
 cttownspoly<-read_sf("data/CTTowns.geojson")
+
+lakes$summer<-ifelse(lakes$Season=="Summer",1,0)
+lakes$spring<-ifelse(lakes$Season=="Spring",1,0)
+
+lakestouse<- lakes %>%
+  group_by(STA_SEQ,Year) %>%
+  summarise(TotalSeason=sum(c(summer,spring)))
+
+lakestouse<-lakestouse[lakestouse$TotalSeason==2,]
+lake_samples<-merge(lakes,lakestouse,by=c("STA_SEQ","Year"))
+
+lake_nut_avg<- lake_samples %>%
+    group_by(STA_SEQ,Year) %>%
+    summarise(Phosphorus=mean(Phosphorus),Nitrogen=mean(Nitrogen))
+
+lake_summer<- lake_samples[lake_samples$Season=="Summer",]
+lake_summer<-lake_summer[,c(1:3,5:7,10)]
+
+lakes<-merge(lake_summer,lake_nut_avg,by=c("STA_SEQ","Year"))
+
 
 
 ##Calculate Trophic Score for Each Parameter (TP, TN, Chlor a, Transparency)
@@ -60,8 +82,8 @@ for (i in 1:dim(lakes)[1]){
 l<- lakes[i,]
 
 ##Parse out the lake data that you are interested in
-lakemappoly<-lakespoly[lakespoly$STA_SEQ==l$STA_SEQ,]
 lakemappt<-lakespts[lakespts$STA_SEQ==l$STA_SEQ,]
+lakemappoly<-lakespoly[lakespoly$HydroID==lakemappt$HydroID,]
 
 ##Make a map of the parsed lake data
 smap<-  tm_shape(cttownspoly)+
@@ -91,12 +113,12 @@ p1<-  ggplot()+
                              "Eutrophic","Highly Eutrophic"),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
-      geom_point(data=l,aes(TAvg,1),shape=17,size=4)+
+      geom_point(data=l,aes(TAvg,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank(),legend.position = "none",
-        axis.text.x=element_text(face = "bold", color = "black", size = 9))
+        axis.text.x=element_text(face = "bold", color = "black", size = 14))
 
 p2<-  ggplot()+
       xlim(0,7)+
@@ -109,7 +131,7 @@ p2<-  ggplot()+
                              "",""),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
-      geom_point(data=l,aes(TPCAT,1),shape=17,size=4)+
+      geom_point(data=l,aes(TPCAT,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
@@ -126,7 +148,7 @@ p3<-  ggplot()+
                                  "",""),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
-      geom_point(data=l,aes(NCAT,1),shape=17,size=4)+
+      geom_point(data=l,aes(NCAT,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
           axis.title=element_blank(), 
           axis.text.y=element_blank(),
@@ -143,7 +165,7 @@ p4<-  ggplot()+
                                  "",""),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
-      geom_point(data=l,aes(CCAT,1),shape=17,size=4)+
+      geom_point(data=l,aes(CCAT,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
@@ -160,7 +182,7 @@ p5<-  ggplot()+
                                  "",""),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
-      geom_point(data=l,aes(SCAT,1),shape=17,size=4)+
+      geom_point(data=l,aes(SCAT,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
@@ -174,14 +196,20 @@ tcat<-textGrob(paste("Trophic Category:",l$Trophic),
 ptjust<-"left"
 ptposx<-0.2
 ptposy<-0.5
-p1t<-textGrob("Trophic State Index",just=ptjust,ptposx,ptposy)#11-12
-p2t<-textGrob("Total Phosphorus",just=ptjust,ptposx,ptposy)#13-14
-p3t<-textGrob("Total Nitrogen",just=ptjust,ptposx,ptposy)#15-16
-p4t<-textGrob("Chlorophyll-a",just=ptjust,ptposx,ptposy)#17-18
-p5t<-textGrob("Transparency",just=ptjust,ptposx,ptposy)#19-20
+fsize<-14
+p1t<-textGrob("Trophic State Index",just=ptjust,ptposx,ptposy,
+              gp=gpar(fontsize=fsize))#11-12
+p2t<-textGrob("Total Phosphorus",just=ptjust,ptposx,ptposy,
+              gp=gpar(fontsize=fsize))#13-14
+p3t<-textGrob("Total Nitrogen",just=ptjust,ptposx,ptposy,
+              gp=gpar(fontsize=fsize))#15-16
+p4t<-textGrob("Chlorophyll-a",just=ptjust,ptposx,ptposy,
+              gp=gpar(fontsize=fsize))#17-18
+p5t<-textGrob("Transparency",just=ptjust,ptposx,ptposy,
+              gp=gpar(fontsize=fsize))#19-20
 
 lay<-rbind(c(1,NA,NA),
-           c(NA,NA,NA),
+           c(1,NA,NA),
            c(2,NA,NA),
            c(3,3,3),
            c(4,NA,NA),
@@ -199,13 +227,16 @@ laketest<-grid.arrange(tcat,
                        heights=unit(c(0.25,0.25,0.25,0.5,0.25,0.5,0.25,
                                       0.5,0.25,0.5,0.25,0.5),
                                     c("in","in","in","in","in","in","in","in",
-                                      "in","in","in","in")),
-                       )
-laketest
+                                      "in","in","in","in")))
+grid.draw(laketest)
 
-ggsave(paste0(i,".png"),laketest,width=15,height=5,units="in",dpi=72)
+ggsave(paste0(i,".png"),laketest,width=20,height=5,units="in",dpi=72)
 
 }
+
+
+lakenames<-paste(lakes$Lake,"SID:",lakes$STA_SEQ,"Lake Assessment",lakes$Year)
+write.csv(lakenames,"lakenames.csv")
 
 background<-textGrob("Lake Information",posx,posy,just=infojust,
                      gp=gpar(fontsize=12,fontface="bold"))#4
