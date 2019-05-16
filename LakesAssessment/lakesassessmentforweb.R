@@ -1,4 +1,4 @@
-setwd("P:/Projects/GitHub_Prj/Lakes/LakesAssessment")
+setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -20,6 +20,8 @@ cttownspoly<-read_sf("data/CTTowns.geojson")
 lakes$summer<-ifelse(lakes$Season=="Summer",1,0)
 lakes$spring<-ifelse(lakes$Season=="Spring",1,0)
 
+#Only calc trophic cat for lakes that have both spring and summer (within one year)
+#could include a summer sample in one year and spring sample in the next year
 lakestouse<- lakes %>%
   group_by(STA_SEQ,Year) %>%
   summarise(TotalSeason=sum(c(summer,spring)))
@@ -99,7 +101,7 @@ lmap<-  tm_shape(lakemappoly)+
 
 wmap<-tmap_arrange(smap,lmap)
 
-tmap_save(wmap,paste0(i,"lake.png"),width=600,height=400,dpi=72)
+tmap_save(wmap,paste0(l$STA_SEQ,l$Year,"map.png"),width=600,height=400,dpi=72)
 
 gradient<-data.frame(x=c(0,1,2,3,4,5,6,7),
                      y=c(1,1,1,1,1,1,1,1),
@@ -108,17 +110,19 @@ gradient<-data.frame(x=c(0,1,2,3,4,5,6,7),
 p1<-  ggplot()+
       xlim(0,7)+
       ylim(0.5,1.5)+
+      #scale_x_continuous(breaks=c(1,3,5,6),
+      #               label=c("Oligotrophic","Mesotrophic",
+      #                       "Eutrophic","Highly Eutrophic"),position="top")+
       scale_x_continuous(breaks=c(1,3,5,6),
-                     label=c("Oligotrophic","Mesotrophic",
-                             "Eutrophic","Highly Eutrophic"),position="top")+
+                     label=c("","",
+                             "",""),position="top")+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
       geom_point(data=l,aes(TAvg,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),legend.position = "none",
-        axis.text.x=element_text(face = "bold", color = "black", size = 14))
+        axis.ticks.y=element_blank(),axis.ticks.x=element_blank(),legend.position = "none")
 
 p2<-  ggplot()+
       xlim(0,7)+
@@ -174,19 +178,17 @@ p4<-  ggplot()+
 p5<-  ggplot()+
       xlim(0,7)+
       ylim(0.5,1.5)+
-      # scale_x_continuous(breaks=c(1,3,5,6),
-      #                label=c("Oligotrophic","Mesotrophic",
-      #                        "Eutrophic","Highly Eutrophic"))+
       scale_x_continuous(breaks=c(1,3,5,6),
-                         label=c("","",
-                                 "",""),position="top")+
+                      label=c("Oligotrophic","Mesotrophic",
+                              "Eutrophic","Highly Eutrophic"))+
       geom_raster(data=gradient,aes(x,y,fill=z),interpolate=TRUE)+
       scale_fill_gradientn(colours = c("blue","cyan","chartreuse"))+
       geom_point(data=l,aes(SCAT,1),shape=17,size=5)+
       theme(panel.background = element_rect(fill = "white", colour = "white"),
         axis.title=element_blank(), 
         axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),axis.ticks.x=element_blank(),legend.position = "none")
+        axis.ticks.y=element_blank(),legend.position = "none",
+        axis.text.x=element_text(face = "bold", color = "black", size = 14))
 
 
 
@@ -208,43 +210,63 @@ p4t<-textGrob("Chlorophyll-a",just=ptjust,ptposx,ptposy,
 p5t<-textGrob("Transparency",just=ptjust,ptposx,ptposy,
               gp=gpar(fontsize=fsize))#19-20
 
-lay<-rbind(c(1,NA,NA),
-           c(1,NA,NA),
-           c(2,NA,NA),
-           c(3,3,3),
-           c(4,NA,NA),
-           c(5,5,5),
-           c(6,NA,NA),
-           c(7,7,7),
-           c(8,NA,NA),
-           c(9,9,9),
-           c(10,NA,NA),
-           c(11,11,11))
+# lay<-rbind(c(1,NA,NA),
+#            c(1,NA,NA),
+#            c(2,NA,NA),
+#            c(3,3,3),
+#            c(4,NA,NA),
+#            c(5,5,5),
+#            c(6,NA,NA),
+#            c(7,7,7),
+#            c(8,NA,NA),
+#            c(9,9,9),
+#            c(10,NA,NA),
+#            c(11,11,11))
 
-laketest<-grid.arrange(tcat,
+lay<-rbind(c(1,NA,NA),
+           c(2,2,2),
+           c(3,NA,NA),
+           c(4,4,4),
+           c(5,NA,NA),
+           c(6,6,6),
+           c(7,NA,NA),
+           c(8,8,8),
+           c(9,NA,NA),
+           c(10,10,10))
+
+
+
+laketrophicplot<-grid.arrange(
                        p1t,p1,p2t,p2,p3t,p3,p4t,p4,p5t,p5,
                        ncol=1,layout_matrix=lay,
-                       heights=unit(c(0.25,0.25,0.25,0.5,0.25,0.5,0.25,
+                       heights=unit(c(0.25,0.5,0.25,0.5,0.25,
                                       0.5,0.25,0.5,0.25,0.5),
                                     c("in","in","in","in","in","in","in","in",
                                       "in","in","in","in")))
-grid.draw(laketest)
+#grid.draw(laketrophicplot)
 
-ggsave(paste0(i,".png"),laketest,width=20,height=5,units="in",dpi=72)
+ggsave(paste0(l$STA_SEQ,l$Year,".png"),laketrophicplot,width=20,height=5,units="in",dpi=72)
+
+##Write html to generate a slide for each lake assessment year##
+l1<-paste0('<section data-background-image="LakesAssessment/data/15864.png" data-background-opacity=0.5 id="',l$STA_SEQ,'">')
+l2<-paste0('<div id="left">')
+l3<-paste0('<p style="text-align:left;">',l$Lake,' SID: ',l$STA_SEQ,'<br> Lake Assessment ',l$Year,'</p>')
+l4<-paste0('<b>Lake Information</b>')
+l5<-paste0('<ul style=font-size:medium;>')
+l6<-paste0('Town: ')
+l7<-paste0('<br>Shore Perimeter: ')
+l8<-paste0('<br>Watershed Area: ')
+l9<-'</ul>'
+l10<-'</div>'
+l11<-paste0('<div id="right"><img src="LakesAssessment/',l$STA_SEQ,l$Year,'map.png" alt="Lake Data">')
+l12<-'</div>'
+l13<-paste0('Trophic Category:',l$Trophic)
+l13<-paste0('<img src="LakesAssessment/',l$STA_SEQ,l$Year,'.png" alt="Lake Data" style="opacity-0.8">')
+l14<-'</section>'
+write(c(l1,l2,l3,l4,l5,l6,l7,l8,l9,l10,l11,l12,l13,l14),"lakeslides.txt",append=TRUE)
 
 }
 
 
-lakenames<-paste(lakes$Lake,"SID:",lakes$STA_SEQ,"Lake Assessment",lakes$Year)
-write.csv(lakenames,"lakenames.csv")
-
-background<-textGrob("Lake Information",posx,posy,just=infojust,
-                     gp=gpar(fontsize=12,fontface="bold"))#4
-location<-textGrob("Town: Town Name",posx,posy,just=infojust)#5
-WArea<-textGrob(paste("Watershed Area (sq km):",lakemapdata$AreaSqKm),posx,posy,just=infojust)#6
-LArea<-textGrob(paste("Lake Area (sq mi):",lakemapdata$LASqMI),posx,posy,just=infojust)#7
-Slen<-textGrob(paste("Shore Perimeter (mi):",lakemapdata$PerMI),posx,posy,just=infojust)#8
-Elevation<-textGrob(paste("Elevation (m)"),posx,posy,just=infojust)#9,
-ldepth<-textGrob("Lake Depth",posx,posy,just=infojust)#10
 
 
