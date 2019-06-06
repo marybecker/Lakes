@@ -37,6 +37,8 @@ lake_summer<- lake_samples[lake_samples$Season=="Summer",]
 lake_summer<-lake_summer[,c(1:3,5:7,10)]
 
 lakes<-merge(lake_summer,lake_nut_avg,by=c("STA_SEQ","Year"))
+lakes$Phosphorus<-lakes$Phosphorus/1000
+lakes$Nitrogen<-lakes$Nitrogen/1000
 
 
 
