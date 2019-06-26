@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "uncas_test",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::2234" } },
+"features": [
+{ "type": "Feature", "properties": { "STA_SEQ": 16012.0, "Station_Na": "Uncas Lake", "Proximity_": "approximately 1500 ft ENE boatramp (center of deep area)", "YLat": 41.3728, "XLong": -72.3188, "Municipali": "LYME", "SubBasin": 4800.0 }, "geometry": { "type": "Point", "coordinates": [ 1118350.4588639724534, 696856.076918364851736 ] } }
+]
+}
