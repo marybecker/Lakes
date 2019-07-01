@@ -1,4 +1,4 @@
-setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
+setwd("P:/Projects/GitHub_Prj/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -11,16 +11,21 @@ library(tmap)
 library(dplyr)
 
 
-##Read in Lakes ysi and geospatial data"
+##Read in Lakes ysi and secchi data"
+ysi<-read.csv("data/YSILakes2019.csv",header=TRUE,stringsAsFactors = FALSE)
+samples<-read.csv("data/samples_2019.csv",header=TRUE,stringsAsFactors = FALSE)
+ysisampleck<-unique(ysi[c("awq","date")])
+samples<-merge(ysisampleck,samples,by=c("awq","date"))
 
-ysi<-read.csv("data/YSILakes2018.csv",header=TRUE)
-samples<-unique(ysi[c("awq","date")])
-lakespoly<-read_sf("data/uncas_test_lakepoly.geojson")
-lakespts<-read_sf("data/uncas_test.geojson")
+##Read in Lakes geospatial data"
+lakespoly<-read_sf("data/lakes_poly.geojson")
+lakespts<-read_sf("data/lakes_pt.geojson")
 cttownspoly<-read_sf("data/CTTowns.geojson")
 
-st<-samples[1,1]
-dt<-samples[1,2]
+for (i in 1:dim(samples)[1]){
+
+st<-samples$awq[i]
+dt<-samples$date[i]
 
 s<-ysi[which(ysi$awq==st&ysi$date==dt),]
 s<-s[order(s$depth),]
@@ -29,9 +34,10 @@ p1<-  ggplot(s,aes(temp,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
         xlim(0,max(s$temp))+
-        labs(y="Depth (m)",x="Temperature (Â°C)",title="Temperature (Â°C)")+
+        labs(y="Depth (m)",x="Temperature (°C)",title="Temperature (°C)")+
         theme_classic()+
-        theme(text=element_text(size=16))
+        theme(text=element_text(size=14))+
+        theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
 p2<-  ggplot(s,aes(do_mgl,depth))+
         geom_path(size=1.5)+
@@ -39,7 +45,8 @@ p2<-  ggplot(s,aes(do_mgl,depth))+
         xlim(0,max(s$do_mgl))+
         labs(y="Depth (m)",x="Dissolved Oxygen (mg/L)",title="Dissolved Oxygen (mg/L)")+
         theme_classic()+
-        theme(text=element_text(size=16))
+        theme(text=element_text(size=14))+
+        theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
 p3<-  ggplot(s,aes(cond,depth))+
         geom_path(size=1.5)+
@@ -48,20 +55,22 @@ p3<-  ggplot(s,aes(cond,depth))+
         labs(y="Depth (m)",x=expression(paste("Conductivity (",mu,"g/L)")),
              title=expression(paste("Conductivity (",mu,"g/L)")))+
         theme_classic()+
-        theme(text=element_text(size=16))
+        theme(text=element_text(size=14))+
+        theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
 p4<-  ggplot(s,aes(bga_microL,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
         xlim(0,max(s$bga_microL))+
         labs(y="Depth (m)",x=expression(paste("Phycocyanin Blue-Green Algae (",mu,"g/L)")),
-             title=expression(paste("Phycocyanin Blue-Green Algae (",mu,"g/L)")))+
+             title=expression(paste("Phycocyanin (",mu,"g/L)")))+
         theme_classic()+
-        theme(text=element_text(size=16))
+        theme(text=element_text(size=14))+
+        theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
 ##Parse out the lake data that you are interested in
-lakemappt<-lakespts[lakespts$STA_SEQ==st,]
-lakemappoly<-lakespoly[lakespoly$sta_seq==st,]
+lakemappt<-lakespts[which(lakespts$STA_SEQ==st),]
+lakemappoly<-lakespoly[which(lakespoly$GNIS_ID==lakemappt$GNIS_ID),]
 
 ##Make a map of the parsed lake data
 smap<-  tm_shape(cttownspoly)+
@@ -76,34 +85,44 @@ lmap<-  tm_shape(lakemappoly)+
   tm_layout(bg.color="midnightblue")
 
 wmap<-tmap_arrange(smap,lmap)
-tmap_save(wmap,paste0(lakespts$STA_SEQ,"map.png"),width=600,height=400,dpi=72)
-map<-readPNG(paste0(lakespts$STA_SEQ,"map.png"))
+tmap_save(wmap,paste0("maps/",st,"map.png"),width=600,height=400,dpi=72)
+map<-readPNG(paste0("maps/",st,"map.png"))
 
 
 lay<-rbind(c(1,2),
-           c(3,NA),
-           c(4,NA),
-           c(5,NA),
-           c(6,7),
-           c(8,9))
+           c(3,2),
+           c(4,2),
+           c(5,2),
+           c(NA,2),
+           c(6,NA),
+           c(7,NA),
+           c(8,NA),
+           c(9,10),
+           c(11,12))
 
 infojust<-0
 posx<-0.2
 posy<-1
-title<-textGrob(lakespoly$LAKE,
-                gp=gpar(fontsize=30,fontface="bold", col="black",just=-1))
-acre<-textGrob(paste("Acreage:",round(lakespoly$ACREAGE,2)),posx,posy,just=infojust)
-town<-textGrob(paste("Town:",lakemappt$Municipali),posx,posy,just=infojust)
-basin<-textGrob(paste("Basin No:",lakemappt$SubBasin),posx,posy,just=infojust)
+title<-textGrob(lakemappt$name,
+                gp=gpar(fontsize=25,fontface="bold", col="black"),posx,posy,just=infojust)
+sdate<-textGrob(paste("Sample Date:",dt),
+                gp=gpar(fontsize=15,fontface="bold", col="black"),posx,posy,just=infojust)
+secchi<-textGrob(paste("Secchi Depth (m):",samples$secchi_m[i]),
+                 gp=gpar(fontsize=15,fontface="bold", col="black"),posx,posy,just=infojust)
+depth<-textGrob(paste("Total Depth (m):",samples$tdepth_m[i]),
+                 gp=gpar(fontsize=15,fontface="bold", col="black"),posx,posy,just=infojust)
+acre<-textGrob(paste("Acres:",round(lakemappoly$area_acre,2)),posx,posy,just=infojust)
+town<-textGrob(paste("Town:",lakemappt$town),posx,posy,just=infojust)
+basin<-textGrob(paste("Drainage Basin:",lakemappt$sbas_nm),posx,posy,just=infojust)
 map<-rasterGrob(map)
 
-laketest<-grid.arrange(title,map,acre,town,basin,p1,p2,p3,p4,
+laketest<-grid.arrange(title,map,sdate,secchi,depth,acre,town,basin,p1,p2,p3,p4,
                        ncol=2,layout_matrix=lay,
-                       heights=unit(c(3,0.25,0.25,0.25,2,2),
-                                    c("in","in","in","in","in","in")))
-laketest
-
-ggsave("ysitest.png",laketest,width=8,height=11,units="in",dpi=72)
+                       heights=unit(c(0.5,0.5,0.5,0.5,1,0.25,0.25,0.25,3,3),
+                                    c("in","in","in","in","in","in","in","in","in")))
 
 
+ggsave(paste("ysipdf/",st,lakemappt$name,"ysi.pdf"),laketest,width=8,height=11,units="in",dpi=72)
+
+}
            
