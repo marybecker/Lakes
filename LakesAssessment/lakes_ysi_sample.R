@@ -1,4 +1,4 @@
-setwd("P:/Projects/GitHub_Prj/Lakes/LakesAssessment")
+setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -34,7 +34,8 @@ p1<-  ggplot(s,aes(temp,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
         xlim(0,max(s$temp))+
-        labs(y="Depth (m)",x="Temperature (°C)",title="Temperature (°C)")+
+        labs(y="Depth (m)",x=expression(paste("Temperature (",degree,"C)")),
+             title=expression(paste("Temperature (",degree,"C)")))+
         theme_classic()+
         theme(text=element_text(size=14))+
         theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
@@ -58,12 +59,12 @@ p3<-  ggplot(s,aes(cond,depth))+
         theme(text=element_text(size=14))+
         theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
-p4<-  ggplot(s,aes(bga_microL,depth))+
+p4<-  ggplot(s,aes(bga_rfu,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
-        xlim(0,max(s$bga_microL))+
-        labs(y="Depth (m)",x=expression(paste("Phycocyanin Blue-Green Algae (",mu,"g/L)")),
-             title=expression(paste("Phycocyanin (",mu,"g/L)")))+
+        xlim(0,max(s$bga_rfu))+
+        labs(y="Depth (m)",x="Phycocyanin Blue-Green Algae (rfu)",
+             title="Phycocyanin (rfu)")+
         theme_classic()+
         theme(text=element_text(size=14))+
         theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
@@ -122,7 +123,7 @@ laketest<-grid.arrange(title,map,sdate,secchi,depth,acre,town,basin,p1,p2,p3,p4,
                                     c("in","in","in","in","in","in","in","in","in")))
 
 
-ggsave(paste("ysipdf/",st,lakemappt$name,"ysi.pdf"),laketest,width=8,height=11,units="in",dpi=72)
+ggsave(paste("ysipdf/",st,lakemappt$name,gsub('/','-',dt),"ysi.pdf"),laketest,width=8,height=11,units="in",dpi=72)
 
 }
            
