@@ -1,4 +1,4 @@
-setwd("/home/mkozlak/Documents/Projects/GitHub/Lakes/LakesAssessment")
+setwd("P:/Projects/GitHub_Prj/Lakes/LakesAssessment")
 
 library(ggplot2)
 library(grid)
@@ -22,6 +22,13 @@ lakespoly<-read_sf("data/lakes_poly.geojson")
 lakespts<-read_sf("data/lakes_pt.geojson")
 cttownspoly<-read_sf("data/CTTowns.geojson")
 
+##X axis limits - Max value for each parameter
+maxtemp<- max(ysi$temp)
+maxdo<-max(ysi$do_mgl)
+maxchlor<-max(ysi$chlor_rfu)
+maxbga<-max(ysi$bga_rfu)
+
+##Generate a pdf for each lake in the dataset
 for (i in 1:dim(samples)[1]){
 
 st<-samples$awq[i]
@@ -33,7 +40,7 @@ s<-s[order(s$depth),]
 p1<-  ggplot(s,aes(temp,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
-        xlim(0,max(s$temp))+
+        xlim(0,maxtemp)+
         labs(y="Depth (m)",x=expression(paste("Temperature (",degree,"C)")),
              title=expression(paste("Temperature (",degree,"C)")))+
         theme_classic()+
@@ -43,18 +50,18 @@ p1<-  ggplot(s,aes(temp,depth))+
 p2<-  ggplot(s,aes(do_mgl,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
-        xlim(0,max(s$do_mgl))+
+        xlim(0,maxdo)+
         labs(y="Depth (m)",x="Dissolved Oxygen (mg/L)",title="Dissolved Oxygen (mg/L)")+
         theme_classic()+
         theme(text=element_text(size=14))+
         theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
 
-p3<-  ggplot(s,aes(cond,depth))+
+p3<-  ggplot(s,aes(chlor_rfu,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
-        xlim(0,max(s$cond))+
-        labs(y="Depth (m)",x=expression(paste("Conductivity (",mu,"g/L)")),
-             title=expression(paste("Conductivity (",mu,"g/L)")))+
+        xlim(0,maxchlor)+
+        labs(y="Depth (m)",x="Chlorophyll (rfu)",
+             title="Chlorophyll (rfu)")+
         theme_classic()+
         theme(text=element_text(size=14))+
         theme(plot.margin=unit(c(1,1,1.5,1.5),"cm"))
@@ -62,7 +69,7 @@ p3<-  ggplot(s,aes(cond,depth))+
 p4<-  ggplot(s,aes(bga_rfu,depth))+
         geom_path(size=1.5)+
         scale_y_reverse(limits=c(max(s$depth),0))+
-        xlim(0,max(s$bga_rfu))+
+        xlim(0,maxbga)+
         labs(y="Depth (m)",x="Phycocyanin Blue-Green Algae (rfu)",
              title="Phycocyanin (rfu)")+
         theme_classic()+
