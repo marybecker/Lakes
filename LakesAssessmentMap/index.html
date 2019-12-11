@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Weather webcams mapping exercise</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel='icon' href='https://newmapsplus.github.io/favicon.ico' type='image/x-icon' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.5.1/leaflet.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,900i" rel="stylesheet">
+    <link href="style.css" type="text/css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="grid-container">
+        <div id="background">
+            <p class="close-background">×</p>
+            <div id="photo"></div>
+        </div>
+        <div id="map"></div>
+        <div id="legend">
+            <div id="content"></div>
+        </div>
+    </div>
+    <!-- HTML for page structure goes here-->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <!-- Link to array of data -->
+    <script src="cameras.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
