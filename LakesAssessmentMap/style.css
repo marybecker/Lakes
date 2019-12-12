@@ -1,30 +1,101 @@
 body {
     margin: 0;
     padding: 0;
-    background: #e3e3e6;
-    font-family: 'Lato', sans-serif;
-    font-weight: 300;
-    color: #3d3d3d;
+    background: #222;
+    font-family: Lato, sans-serif;
     font-size: 100%;
-
+    color: #ddd;
 }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: auto 20vw;
-    grid-template-rows: auto 20vh;
+header {
+    width: 80%;
+    margin: 10px auto 10px auto;
 }
 
-/* Portrait mode */
+h1 {
+  position: absolute;
+  margin-top: 0;
+  top: 10px;
+  left: 50px;
+  font-size: 1.5em;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 10px 15px;
+  /* Add styles to match Leaflet UI elements */
+  background: rgba(256, 256, 256, .3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  z-index: 800;
+}
 
 #map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
     width: 100%;
-    height: 80vh;
-    grid-row-start: 1;
-    grid-row-end: 2;
-    grid-column-start: 1;
-    grid-column-end: 3;
+    background: rgba(63, 63, 63, 0.9);
 }
+
+p {
+    font-size: 1em;
+    color: #ddd;
+}
+
+a {
+    color: #004A8B;
+}
+
+a:hover {
+    color: rgb(67, 69, 71);
+    text-decoration: none;
+}
+
+#info-button {
+    padding: 8px 5px;
+    font-size: 0.9em;
+    font-weight: bolder;
+    border: 2px solid rgba(244, 244, 244, 0.2);
+    background: rgba(100, 100, 100, 0.9);
+    color: rgba(244, 244, 244, 0.8);
+    /* box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); */
+    border-radius: 5px;
+    position: fixed;
+    top: 11px;
+    right: 52px;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+#footer {
+    width: 100%;
+    background: rgba(244, 244, 244, 0.8);
+    color: rgba(20, 20, 20, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    height: 0px;
+    padding: 0px;
+    z-index: 9000;
+    position: absolute;
+    bottom: -10px;
+    overflow: scroll;
+}
+
+#footer div {
+    padding: 10px;
+}
+
+#footer h1 {
+    font-size: 1.3em;
+    margin: 0 0 5px 0;
+}
+
+.footer-img {
+    float: right;
+    height: 10vh;
+    margin: 10px;
+}
+
 
 #legend {
     padding: 10px;
@@ -90,19 +161,6 @@ img.hires {
     color: white;
     font-weight: 900;
     font-size: 2em;
-}
-
-#photo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0 auto;
-    height: 80%;
-    width: 80%;
-    z-index: 1000;
-    text-align: center;
-    /* background-color: rgb(194, 194, 194); */
 }
 
 

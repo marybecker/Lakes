@@ -113,7 +113,7 @@ lay<-rbind(c(1,2),
 infojust<-0
 posx<-0.01
 posy<-1
-title<-textGrob(paste0(lakemappt$name," (SID ",samples$awq,")"),
+title<-textGrob(paste0(lakemappt$name," (SID ",st,")"),
                 gp=gpar(fontsize=25,fontface="bold", col="black"),posx,posy,just=infojust)
 sdate<-textGrob(paste("Sample Date:",dt),
                 gp=gpar(fontsize=15,fontface="bold", col="black"),posx,posy,just=infojust)
