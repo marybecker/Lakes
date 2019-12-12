@@ -9,10 +9,12 @@ library(sf)
 library(png)
 library(tmap)
 library(dplyr)
+library(pdftools)
 
 
 ##Read in Lakes ysi and secchi data"
 ysi<-read.csv("data/2019_Lakes_YSI_09262019.csv",header=TRUE,stringsAsFactors = FALSE)
+ysi$chlor_rfu<-ifelse(ysi$chlor_rfu <= 0,0,ysi$chlor_rfu)
 samples<-read.csv("data/samples_2019_111319.csv",header=TRUE,stringsAsFactors = FALSE)
 ysisampleck<-unique(ysi[c("awq","date")])
 samples<-merge(ysisampleck,samples,by=c("awq","date"))
@@ -130,7 +132,31 @@ laketest<-grid.arrange(title,map,sdate,secchi,depth,acre,town,basin,p1,p2,p3,p4,
                                     c("in","in","in","in","in","in","in","in","in")))
 
 
-ggsave(paste("ysipdf/",st,lakemappt$name,gsub('/','-',dt),"ysi.pdf"),laketest,width=8,height=11,units="in",dpi=72)
+ggsave(paste0("ysipdf/",st,lakemappt$name,gsub('/','-',dt),"ysi.pdf"),laketest,width=8,height=11,units="in",dpi=72)
 
 }
+
+##Combine site pdfs for interactive map
+
+lf<-as.data.frame(list.files("ysipdf"))
+lf$sid<-substr(lf[,1],1,5)
+lf$cnt<-1
+cntpdf<-aggregate(lf[c("cnt")],by=lf[c("sid")],sum)
+
+for (i in 1:dim(cntpdf)[1]){
+  if (cntpdf[i,2]>1){
+    pdfjoin<-lf[lf$sid==cntpdf[i,1],]
+    pdfjoin$file<-paste0("ysipdf/",pdfjoin$`list.files("ysipdf")`)
+    pdf_combine(pdfjoin[,4],paste0('ysipdf/bysite/',pdfjoin[1,2],'.pdf'))
+  }
+  
+  if (cntpdf[i,2]==1){
+    pdf<-lf[lf$sid==cntpdf[i,1],]
+    pdf$file<-paste0("ysipdf/",pdf$`list.files("ysipdf")`)
+    file.copy(pdf$file,paste0('ysipdf/bysite/',pdf$sid,'.pdf'))
+  }
+}
+
+
+
            
