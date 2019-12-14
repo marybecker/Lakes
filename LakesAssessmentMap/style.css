@@ -30,12 +30,13 @@ h1 {
   z-index: 800;
 }
 
+
 #map {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 100%;
-    background: rgba(63, 63, 63, 0.9);
+    /*background: rgba(63, 63, 63, 0.9);*/
 }
 
 p {
@@ -96,33 +97,37 @@ a:hover {
     margin: 10px;
 }
 
-
-#legend {
-    padding: 10px;
-    grid-row-start: 2;
-    grid-row-end: 3;
-    grid-column-start: 1;
-    grid-column-end: 3;
+.legend {
+    padding: 6px 8px;
+    font-size: 1em;
+    border: 2px solid rgba(244, 244, 244, 0.2);
+    background: rgba(100, 100, 100, 0.9);
+    color: rgba(244, 244, 244, 0.8);
+    border-radius: 5px;
 }
 
-#legend div {
-    /* display: none; */
+.legend h3 {
+    font-size: 1.1em;
+    font-weight: bolder;
+    color: #ddd;
+    margin: 0 0 10px 0;
+}
+
+.legend span {
+    width: 20px;
+    height: 20px;
     float: left;
-    margin: 5px 5px 0 0;
+    margin: 0 10px 4px 0;
 }
 
-#legend img {
-    width: 150px;
-    display: inherit;
+.legend label {
+    font-size: 1.1em;
 }
 
-#legend h2 {
-    font-size: 1.2em;
-    margin-bottom: 5px;
-}
-
-#legend p {
-    display: none;
+.legend label:after {
+    content: '';
+    display: block;
+    clear: both;
 }
 
 #content {
@@ -161,6 +166,19 @@ img.hires {
     color: white;
     font-weight: 900;
     font-size: 2em;
+}
+
+#photo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+    height: 80%;
+    width: 80%;
+    z-index: 1000;
+    text-align: center;
+    /* background-color: rgb(194, 194, 194); */
 }
 
 
