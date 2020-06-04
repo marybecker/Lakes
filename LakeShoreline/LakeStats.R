@@ -14,8 +14,11 @@ SumAcres = sum(bufferStats$area_buffe)
 
 CountBuilding = sum(Buildings$FREQUENCY)
 
+options(digits = 3, scipen = 999)
+
 ##Number of buildings per lake shore area (N/sqft)
-"Number of buildings per lake shore area (sqft)" = print(CountBuilding/Total_sq_ft)
+"Number of buildings per lake shore sqft" = print(CountBuilding/Total_sq_ft)
+"Number of buildings per lake shore acre" = print(CountBuilding/Total_sq_ft)
 
 ##Avg buildings per lake shore
 "Average buildings per lake shore" = print(CountBuilding/(length(bufferStats$GNIS_ID)))
@@ -25,8 +28,8 @@ CountBuilding = sum(Buildings$FREQUENCY)
 
 ##Number of roads per lake shore area (N/sqft)
 SumRoads = sum(lakeRoads$SUM_Join_C)
-"Number of roads per lake shore area (sqft)" = print(SumRoads/Total_sq_ft)
-"Number of roads per lake shore area (acres)" = print(SumRoads/SumAcres)
+"Number of roads per lake shore sqft" = print(SumRoads/Total_sq_ft)
+"Number of roads per lake shore acres" = print(SumRoads/SumAcres)
 
 ##Percent of lake shore area covered by road
 "Percent lake shore area covered by road" = print((sum(lakeRoads$SUM_area_r)/(SumAcres)) * 100)
