@@ -136,5 +136,44 @@ bp <- ggplot(LakesState, aes(Statewide,other_impervious_acres)) +
 
 bp
 
-summary(LakesState$other_impervious_acres)
-summary(impPercent$impervious_surface_percent)
+##
+lakesPercent <- data.frame(impPercent)
+
+lakesPercent
+
+library(ggplot2)
+statewide_percents <- subset(lakesPercent, select = c("impervious_surface_percent"))
+statewide_percents['Statewide'] = 'Statewide'
+
+##outlier labels
+#stat_summary(
+  #aes(label = round(stat(y), 1)),
+  #geom = "text", 
+  #fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+  #size = 2.5,
+  #hjust = 0.5,
+  #vjust = -1
+#)+
+
+quantile(statewide_percents$impervious_surface_percent, probs = c(0.25, 0.75))
+
+bp1 <- ggplot(statewide_percents, aes(Statewide,impervious_surface_percent)) +
+  geom_boxplot(outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  geom_text(data = statewide_percents, aes(Statewide, med,label = sprintf("%0.2f", round(med, digits = 3))), 
+            position = position_dodge(width = 0.8), size = 4, vjust = -12, hjust = -0.4)+
+  annotate("text", x = 0.6, y = 2.27, label = c("25Q"))+
+  annotate("text", x = 0.6, y = 10.54, label = c("75Q"))+
+  coord_flip()+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  ##geom_jitter(width = 0.5, cex=1.2,shape=1)+
+  labs(title = "CT Lakes Impervious Surface Cover",x="Statewide Lakes", y="\nPercent Impervious Cover (acres)\n")+
+  theme_bw()+
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5))+
+  scale_y_continuous(breaks = round(seq(min(statewide_percents$impervious_surface_percent), max(statewide_percents$impervious_surface_percent), by = 5),1))
+
+
+bp1
