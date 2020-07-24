@@ -6,6 +6,7 @@ imperviousStats<-read.csv("CT Lakes/impervious_stats.csv",header = TRUE)
 Buildings<-(read.csv("CT Lakes/buffer_building_stats.csv", header = TRUE))
 impPercent<-(read.csv("CT Lakes/LakesData.csv", header = TRUE))
 Lakechem<-(read.csv("CT Lakes/lakesSumSummer_12_17.csv", header = TRUE))
+
 lakeRoads<-(read.csv("CT Lakes/lakes_poly_Buffer_roads.csv", header = TRUE))
 
 db_path <- paste0(getwd(),'/CT Lakes/')
@@ -96,20 +97,12 @@ library(ggplot2)
 library(scales)
 
 
-
-boxplot(lakesData$total_impervious_acres)
-
-str(lakesData)
-
-
-
 data_summ <- function(x) {
   m <- mean(x)
   ymin <- m-sd(x)
   ymax <- m+sd(x)
   return(c(y=m,ymin=ymin,ymax=ymax))
 }
-
 
 
 med = median(lakesPercent$total_impervious_percent)
@@ -150,12 +143,12 @@ bp1 <- ggplot(statewide_percents, aes(Statewide,total_impervious_percent))+
     size = 2.5,
     hjust = 0.5,
     vjust = -1)+
-  annotate("text", x = 0.6, y = 10.6, label = c("25Q"))+
-  annotate("text", x = 0.6, y = 36.6, label = c("75Q"))+
+  annotate("text", x = 0.6, y = 2.64, label = c("25Q"))+
+  annotate("text", x = 0.6, y = 11.69, label = c("75Q"))+
   coord_flip()+
   stat_boxplot(geom = 'errorbar', width = 0.1)+
   ##geom_jitter(width = 0.5, cex=1.2,shape=1)+
-  labs(title = "CT Lakes Impervious Surface Cover",x="Statewide Lakes", y="\nPercent Impervious Cover (acres)\n")+
+  labs(title = "CT Lakes Impervious Surface Cover",x="Statewide Lakes", y="\nPercent Impervious Cover\n")+
   theme_bw()+
   theme(axis.text.y = element_blank(), 
         axis.ticks.y = element_blank(),
@@ -165,3 +158,7 @@ bp1 <- ggplot(statewide_percents, aes(Statewide,total_impervious_percent))+
 
 
 bp1
+
+##Shoreline dev + chem
+
+Lakechem
