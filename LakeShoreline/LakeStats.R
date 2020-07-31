@@ -5,7 +5,6 @@ imperviousStats<-read.csv("CT Lakes/impervious_stats.csv",header = TRUE)
 ##lakeRoads<-(read.csv("CT Lakes/roads_stats.csv", header = TRUE))
 Buildings<-(read.csv("CT Lakes/buffer_building_stats.csv", header = TRUE))
 impPercent<-(read.csv("CT Lakes/LakesData.csv", header = TRUE))
-Lakechem<-(read.csv("CT Lakes/lakesSumSummer_12_17.csv", header = TRUE))
 
 lakeRoads<-(read.csv("CT Lakes/lakes_poly_Buffer_roads.csv", header = TRUE))
 
@@ -95,6 +94,7 @@ write.csv(lakesData, "CT Lakes/LakesData.csv", row.names = FALSE)
 ##boxplot lakesData
 library(ggplot2)
 library(scales)
+library(ggrepel)
 
 
 data_summ <- function(x) {
@@ -137,7 +137,7 @@ bp1 <- ggplot(statewide_percents, aes(Statewide,total_impervious_percent))+
   geom_text(data = statewide_percents, aes(Statewide, med,label = sprintf("%0.2f", round(med, digits = 3))), 
             position = position_dodge(width = 0.8), size = 4, vjust = -12, hjust = 0.58)+
   stat_summary(
-    aes(label = round(stat(y), 1)),
+    aes(label = round(stat(y), 0)),
     geom = "text", 
     fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
     size = 2.5,
@@ -161,4 +161,125 @@ bp1
 
 ##Shoreline dev + chem
 
+Lakechem<-(read.csv("CT Lakes/lakesSumSummer_12_17.csv", header = TRUE))
+
 Lakechem
+
+lakesDf2 <- impPercent %>%
+  left_join(Lakechem, by = "GNIS_ID") 
+
+lakesDf3 <- data.frame(na.omit(lakesDf2))
+
+
+TrophicBoxplot <- ggplot(lakesDf3, aes(x= Trophic_Simple, y= total_impervious_percent, fill = Trophic_Simple)) + 
+  geom_boxplot(outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development by Trophic State",x="\nTrophic Classification\n", y="\nPercent Impervious Cover\n")+
+  scale_fill_manual(values = c("Oligotrophic" = "#99CCFF",
+                               "Mesotrophic" = "white",
+                               "Eutrophic" = "#FF9966"))+
+  theme_bw()+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(axis.text.x = element_text(hjust = 0.5))+
+  theme(legend.position="none")
+
+TrophicBoxplot
+
+
+TrophicBoxplot2 <- ggplot(lakesDf3, aes(x= TPCAT, y= total_impervious_percent, group = TPCAT)) + 
+  geom_boxplot(aes(fill = factor(TPCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development by Chem Grouping",x="\nTrophic Grouping\n", y="\nPercent Impervious Cover\n")+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(lakesDf3$TPCAT), max(lakesDf3$TPCAT), by = 1),1))
+
+TrophicBoxplot2
+
+##scatterplots
+
+Lakechem_df <- subset(lakesDf3, select = c("GNIS_ID", 
+                                           "GNIS_Name",
+                                           "total_impervious_percent",
+                                           "TPCAT",
+                                           "Phosphorus",
+                                           "Nitrogen",
+                                           "Chlorophyll.a",
+                                           "Secchi"))
+
+
+write.csv(Lakechem_df, "CT Lakes/Lakechem_df2.csv", row.names = FALSE)
+Lakechem_df2 <- (read.csv("CT Lakes/Lakechem_df2.csv", header = TRUE))
+
+d2 <- data.frame(Lakechem_df2, row.names = 2)
+
+d <- d2
+d$GNIS_Name <- rownames(d)
+
+ChemPlot_Phosphorus <- ggplot(Lakechem_df2, aes(x=total_impervious_percent, y=Phosphorus))+ 
+  geom_point(size = 3, shape = 19, color = "blue")+
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE, color = "black", linetype = "dashed")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title = "Lakes Development Phosphorus",x="\nTotal Impervious Percent\n", y="\nPhosphorus (mg/L)\n")+
+  geom_text_repel(data = subset(d, Phosphorus > 0.05), aes(label = GNIS_Name))
+
+
+ChemPlot_Phosphorus
+
+
+ChemPlot_Nitrogen <- ggplot(Lakechem_df, aes(x=total_impervious_percent, y=Nitrogen))+ 
+  geom_point(size = 3, shape = 19, color = "orange")+
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE, color = "black", linetype = "dashed")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title = "Lakes Development Nitrogen",x="\nTotal Impervious Percent\n", y="\nNitrogen(mg/L)\n")+
+  geom_text_repel(data = subset(d, Nitrogen > 1.2), aes(label = GNIS_Name))
+
+
+
+ChemPlot_Nitrogen
+
+
+ChemPlot_Chloro <- ggplot(Lakechem_df, aes(x=total_impervious_percent, y=Chlorophyll.a))+ 
+  geom_point(size = 3, shape = 19, color = "dark blue")+
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE, color = "black", linetype = "dashed")+
+  ##geom_density_2d(color = "red")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title = "Lakes Development Chlorophyll a",x="\nTotal Impervious Percent\n", y="\nChlorophyll a (μg/L)\n")+
+  geom_text_repel(data = subset(d, Chlorophyll.a > 60), aes(label = GNIS_Name))
+
+
+ChemPlot_Chloro
+
+
+ChemPlot_Secchi <- ggplot(Lakechem_df, aes(x=total_impervious_percent, y=Secchi))+ 
+  geom_point(size = 3, shape = 19, color = "red")+
+  ##geom_smooth(method=lm, se=FALSE, fullrange=TRUE, color = "black", linetype = "dashed")+
+  ##geom_density_2d(color = "red")+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  labs(title = "Lakes Development Secchi",x="\nTotal Impervious Percent\n", y="\nSecchi (m)\n")+
+  geom_text_repel(data = subset(d, Secchi > 6), aes(label = GNIS_Name))
+
+
+ChemPlot_Secchi
