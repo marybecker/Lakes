@@ -4,7 +4,7 @@ bufferStats<-read.csv("CT Lakes/lakes_buffer.csv",header=TRUE)
 imperviousStats<-read.csv("CT Lakes/impervious_stats.csv",header = TRUE)
 ##lakeRoads<-(read.csv("CT Lakes/roads_stats.csv", header = TRUE))
 Buildings<-(read.csv("CT Lakes/buffer_building_stats.csv", header = TRUE))
-impPercent<-(read.csv("CT Lakes/LakesData.csv", header = TRUE))
+impPercent<-(read.csv("CT Lakes/LakesData1.csv", header = TRUE))
 
 lakeRoads<-(read.csv("CT Lakes/lakes_poly_Buffer_roads.csv", header = TRUE))
 
@@ -88,7 +88,7 @@ options(scipen=999)
 lakesData
 
 
-write.csv(lakesData, "CT Lakes/LakesData.csv", row.names = FALSE)
+##write.csv(lakesData, "CT Lakes/LakesData.csv", row.names = FALSE)
 
 
 ##boxplot lakesData
@@ -174,18 +174,13 @@ lakesDf3 <- data.frame(na.omit(lakesDf2))
 TrophicBoxplot <- ggplot(lakesDf3, aes(x= Trophic_Simple, y= total_impervious_percent, fill = Trophic_Simple)) + 
   geom_boxplot(outlier.colour="black", outlier.shape=8,
                outlier.size=2)+
-  labs(title = "Lakes Development by Trophic State",x="\nTrophic Classification\n", y="\nPercent Impervious Cover\n")+
+  labs(title = "Lakes Development by Trophic Category",x="\nTrophic Classification\n", y="\nPercent Impervious Cover\n")+
+  geom_text_repel(data = subset(lakesDf3, total_impervious_percent > 24), aes(label = GNIS_Name))+
+  scale_x_discrete(limits = rev(levels(as.factor(lakesDf3$Trophic_Simple))))+
   scale_fill_manual(values = c("Oligotrophic" = "#99CCFF",
-                               "Mesotrophic" = "white",
+                               "Mesotrophic" = "gray",
                                "Eutrophic" = "#FF9966"))+
   theme_bw()+
-  stat_summary(
-    aes(label = round(stat(y), 0)),
-    geom = "text", 
-    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
-    size = 2.5,
-    hjust = 0.5,
-    vjust = -1)+
   theme(plot.title = element_text(hjust = 0.5))+
   stat_summary(fun = mean, geom="point", shape=23, size=3)+
   stat_boxplot(geom = 'errorbar', width = 0.1)+
@@ -195,10 +190,18 @@ TrophicBoxplot <- ggplot(lakesDf3, aes(x= Trophic_Simple, y= total_impervious_pe
 TrophicBoxplot
 
 
-TrophicBoxplot2 <- ggplot(lakesDf3, aes(x= TPCAT, y= total_impervious_percent, group = TPCAT)) + 
+TPBoxplot <- ggplot(lakesDf3, aes(x= TPCAT, y= total_impervious_percent, group = TPCAT)) + 
   geom_boxplot(aes(fill = factor(TPCAT)),outlier.colour="black", outlier.shape=8,
                outlier.size=2)+
-  labs(title = "Lakes Development by Chem Grouping",x="\nTrophic Grouping\n", y="\nPercent Impervious Cover\n")+
+  labs(title = "Lakes Development TPCAT",x="\nChem Grouping (TPCAT)\n", y="\nPercent Impervious Cover\n")+
+  geom_text_repel(data = subset(lakesDf3, total_impervious_percent > 15), aes(label = GNIS_Name))+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
   scale_fill_manual(values = c("1" = "#99CCFF",
                                "2" = "gray",
                                "3" = "gray",
@@ -212,7 +215,90 @@ TrophicBoxplot2 <- ggplot(lakesDf3, aes(x= TPCAT, y= total_impervious_percent, g
   theme(legend.position="none")+
   scale_x_continuous(breaks = round(seq(min(lakesDf3$TPCAT), max(lakesDf3$TPCAT), by = 1),1))
 
-TrophicBoxplot2
+TPBoxplot
+
+
+NBoxplot <- ggplot(lakesDf3, aes(x= NCAT, y= total_impervious_percent, group = NCAT)) + 
+  geom_boxplot(aes(fill = factor(NCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development NCAT",x="\nChem Grouping (NCAT)\n", y="\nPercent Impervious Cover\n")+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(lakesDf3$NCAT), max(lakesDf3$NCAT), by = 1),1))
+
+NBoxplot
+
+
+CBoxplot <- ggplot(lakesDf3, aes(x= CCAT, y= total_impervious_percent, group = CCAT)) + 
+  geom_boxplot(aes(fill = factor(CCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development CCAT",x="\nChem Grouping (CCAT)\n", y="\nPercent Impervious Cover\n")+
+  geom_text_repel(data = subset(lakesDf3, total_impervious_percent > 20), aes(label = GNIS_Name))+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(lakesDf3$CCAT), max(lakesDf3$CCAT), by = 1),1))
+
+CBoxplot
+
+
+SBoxplot <- ggplot(lakesDf3, aes(x= SCAT, y= total_impervious_percent, group = SCAT)) + 
+  geom_boxplot(aes(fill = factor(SCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development SCAT",x="\nChem Grouping (SCAT)\n", y="\nPercent Impervious Cover\n")+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(lakesDf3$SCAT), max(lakesDf3$SCAT), by = 1),1))
+
+SBoxplot
+
 
 ##scatterplots
 
@@ -226,7 +312,7 @@ Lakechem_df <- subset(lakesDf3, select = c("GNIS_ID",
                                            "Secchi"))
 
 
-write.csv(Lakechem_df, "CT Lakes/Lakechem_df2.csv", row.names = FALSE)
+##write.csv(Lakechem_df, "CT Lakes/Lakechem_df2.csv", row.names = FALSE)
 Lakechem_df2 <- (read.csv("CT Lakes/Lakechem_df2.csv", header = TRUE))
 
 d2 <- data.frame(Lakechem_df2, row.names = 2)
@@ -283,3 +369,104 @@ ChemPlot_Secchi <- ggplot(Lakechem_df, aes(x=total_impervious_percent, y=Secchi)
 
 
 ChemPlot_Secchi
+
+###Buildings area graphics
+
+
+Buildings
+
+lakechem
+
+buildingStats <- Lakechem %>%
+  left_join(Buildings, by = "GNIS_ID")
+
+buildingStats[is.na(buildingStats)] <- 0
+
+##write.csv(buildingStats, "CT Lakes/buildingStats.csv", row.names = FALSE)
+
+TPBoxplotB <- ggplot(buildingStats, aes(x= TPCAT, y= FREQUENCY, group = TPCAT)) + 
+  geom_boxplot(aes(fill = factor(TPCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  geom_text_repel(data = subset(buildingStats, FREQUENCY > 200), aes(label = locationName))+
+  labs(title = "Lakes Development TPCAT",x="\nChem Grouping (TPCAT)\n", y="\nNumber of Lakeshore Buildings\n")+
+  stat_summary(
+    aes(label = round(stat(y), 0)),
+    geom = "text", 
+    fun= function(y) { o <- boxplot.stats(y)$out; if(length(o) == 0) NA else o },
+    size = 2.5,
+    hjust = 0.5,
+    vjust = -1)+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(buildingStats$TPCAT), max(buildingStats$TPCAT), by = 1),1))
+
+TPBoxplotB
+
+NBoxplotB <- ggplot(buildingStats, aes(x= NCAT, y= FREQUENCY, group = NCAT)) + 
+  geom_boxplot(aes(fill = factor(NCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development NCAT",x="\nChem Grouping (NCAT)\n", y="\nNumber of Lakeshore Buildings\n")+
+  geom_text_repel(data = subset(buildingStats, FREQUENCY > 200), aes(label = locationName))+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(buildingStats$NCAT), max(buildingStats$NCAT), by = 1),1))
+
+NBoxplotB
+
+CBoxplotB <- ggplot(buildingStats, aes(x= CCAT, y= FREQUENCY, group = CCAT)) + 
+  geom_boxplot(aes(fill = factor(CCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development CCAT",x="\nChem Grouping (CCAT)\n", y="\nNumber of Lakeshore Buildings\n")+
+  geom_text_repel(data = subset(buildingStats, FREQUENCY > 200), aes(label = locationName))+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(buildingStats$CCAT), max(buildingStats$CCAT), by = 1),1))
+
+CBoxplotB
+
+SBoxplotB <- ggplot(buildingStats, aes(x= SCAT, y= FREQUENCY, group = SCAT)) + 
+  geom_boxplot(aes(fill = factor(SCAT)),outlier.colour="black", outlier.shape=8,
+               outlier.size=2)+
+  labs(title = "Lakes Development SCAT",x="\nChem Grouping (SCAT)\n", y="\nNumber of Lakeshore Buildings\n")+
+  geom_text_repel(data = subset(buildingStats, FREQUENCY > 200), aes(label = locationName))+
+  scale_fill_manual(values = c("1" = "#99CCFF",
+                               "2" = "gray",
+                               "3" = "gray",
+                               "4" = "gray",
+                               "5" = "#FF9966",
+                               "6" = "#FF9966"))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  stat_summary(fun = mean, geom="point", shape=23, size=3)+
+  stat_boxplot(geom = 'errorbar', width = 0.1)+
+  theme(legend.position="none")+
+  scale_x_continuous(breaks = round(seq(min(buildingStats$SCAT), max(buildingStats$SCAT), by = 1),1))
+
+SBoxplotB
