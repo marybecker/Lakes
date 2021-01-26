@@ -1,18 +1,33 @@
-setwd("C:/Users/deepuser/Documents/Projects")
+setwd("")
+
+library(dplyr)
 
 ##Read in Lakes Chem and Secchi data
-sites<-read.csv("Stations.csv",header=TRUE)
-sites<-sites[,c(1,2)]
-colnames(sites)[1]<-"AWQ"
-lakes<-read.csv("LakesSummerChem.csv",header=TRUE)
-lakes<-lakes[,c(3,4,5,6,8)]
-lakes<- aggregate(lakes,by = list(lakes$AWQ),FUN = mean)
-lakes<-lakes[,2:6]
+lakes<-read.csv("data/lakedata14_16_exampleData.csv",header=TRUE)
+
+lakes$summer<-ifelse(lakes$Season=="Summer",1,0)
+lakes$spring<-ifelse(lakes$Season=="Spring",1,0)
+
+#Only calc trophic cat for lakes that have both spring and summer (within one year)
+#could include a summer sample in one year and spring sample in the next year
+lakestouse<- lakes %>%
+  group_by(STA_SEQ,Year) %>%
+  summarise(TotalSeason=sum(c(summer,spring)))
+
+lakestouse<-lakestouse[lakestouse$TotalSeason==2,]
+lake_samples<-merge(lakes,lakestouse,by=c("STA_SEQ","Year"))
+
+lake_nut_avg<- lake_samples %>%
+    group_by(STA_SEQ,Year) %>%
+    summarise(Phosphorus=mean(Phosphorus),Nitrogen=mean(Nitrogen))
+
+lake_summer<- lake_samples[lake_samples$Season=="Summer",]
+lake_summer<-lake_summer[,c(1:3,5:7,10)]
+
+lakes<-merge(lake_summer,lake_nut_avg,by=c("STA_SEQ","Year"))
 lakes$Phosphorus<-lakes$Phosphorus/1000
 lakes$Nitrogen<-lakes$Nitrogen/1000
-GNIS<-read.csv("lakesptsGNIS_ID.csv",header=TRUE)
-colnames(GNIS)[1]<-"AWQ"
-GNIS<-GNIS[,c(1,9)]
+
 
 ##Calculate Trophic Score for Each Parameter (TP, TN, Chlor a, Transparency)
 lakes$TPCAT<-ifelse(lakes$Phosphorus<=0.010,1,
@@ -52,9 +67,4 @@ lakes$Trophic<- ifelse(lakes$TAvg<=2,"Oligotrophic",
                                      ifelse(lakes$TAvg>4 & lakes$TAvg<=5,"Late Mesotrophic",
                                             ifelse(lakes$TAvg>5 & lakes$TAvg<6,"Eutrophic",
                                                    ifelse(lakes$TAvg == 6,"Highly Eutrophic",NA))))))
-
-lakes<-merge(lakes,sites,by="AWQ")
-lakes<-merge(lakes,GNIS,by="AWQ")
-
-write.csv(lakes,"lakesSumSummer_12_17.csv",row.names=FALSE)
 

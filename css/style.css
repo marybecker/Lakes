@@ -1,0 +1,74 @@
+p {
+    line-height: 1.7rem;
+}
+
+a {
+    color: aqua;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+#map {
+    height: 80vh;
+    background: #d9d9d9;
+    /*background: #20282e;*/
+}
+
+#legend {
+    font-size: 1rem;
+    border-radius: 5px;
+    max-width: 500px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#legend span {
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0 10px 4px 0;
+}
+
+#legend label {
+    font-size: 0.9rem;
+}
+
+#legend label:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.caption{
+    font-style: italic;
+}
+
+.circle {
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+
+.customTooltip {
+    background: #41464c;
+    color: #ffffff;
+    font-size: 0.8vw;
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+
+    aside {
+        height: 80vh;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {}
