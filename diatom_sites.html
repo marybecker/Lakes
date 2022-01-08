@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sediment Diatom Project</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <!-- request styles -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/diatom_site_style.css">
+</head>
+<body>
+<div id='map'></div>
+<div id='console'>
+    <h1>Sediment Diatom Lakes Site Selection</h1>
+    <p>Data:  <a href='.csv' target="_blank">
+        Historical Lake Data Provided by Ansel</a> </p>
+    <div class='session'>
+        <h2>Percent Core Forest</h2>
+
+        <div class='row colors'>
+        </div>
+        <div class='row labels'>
+            <div class='label'>5</div>
+            <div class='label'>10</div>
+            <div class='label'>30</div>
+            <div class='label'>40</div>
+            <div class='label'>55</div>
+        </div>
+        <div class='session' id='sliderbar'>
+            <h2>Year: <label id='active-year'>1985</label></h2>
+            <input id='slider' class='row' type='range' min='0' max='6' step='1' value='0' />
+        </div>
+    </br>
+
+        Map Last updated:  01/08/22</br>
+        Author: Mary Becker</br>
+        <a href="https://github.com/marybecker/Lakes"  target="_blank">Map and Data Details</a>
+
+    </div>
+
+</div>
+
+<!-- mapbox gl js -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+
+
+<script src="js/diatom_sites.js"></script>
+</body>
+</html>
