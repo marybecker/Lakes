@@ -4,6 +4,6 @@ Calculate trophic assesment for a lake sample in CT using CT WQS and CALM method
 
 Plot YSI lakes cast. pdf Report.
 
-## Sediment Diatom Site Selection Map
+## Sediment Diatom Sites Exploratory Analysis
 
-https://marybecker.github.io/Lakes/diatom_sites.html
+https://marybecker.github.io/Lakes/sediment_diatom_site_selection.html
