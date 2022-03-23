@@ -1,4 +1,4 @@
-setwd("P:/Projects/GitHub_Prj/Lakes/LakesYSI")
+setwd("C:/Users/deepuser/Documents/Projects/ProgramDev/Lakes/LakesYSI/")
 
 library(ggplot2)
 library(grid)
@@ -13,9 +13,10 @@ library(pdftools)
 
 
 ##Read in Lakes ysi and secchi data"
-ysi<-read.csv("data/2019_Lakes_YSI_09262019.csv",header=TRUE,stringsAsFactors = FALSE)
+ysi<-read.csv("data/LakesYSI_2012_2021.csv",header=TRUE,stringsAsFactors = FALSE)
 ysi$chlor_rfu<-ifelse(ysi$chlor_rfu <= 0,0,ysi$chlor_rfu)
-samples<-read.csv("data/samples_2019_111319.csv",header=TRUE,stringsAsFactors = FALSE)
+#ysi <- ysi[,1:25]
+samples<-read.csv("data/Samples_2012_2021.csv",header=TRUE,stringsAsFactors = FALSE)
 ysisampleck<-unique(ysi[c("awq","date")])
 samples<-merge(ysisampleck,samples,by=c("awq","date"))
 
