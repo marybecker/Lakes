@@ -26,10 +26,10 @@ lakespts<-read_sf("data/lakes_pt.geojson")
 cttownspoly<-read_sf("data/CTTowns.geojson")
 
 ##X axis limits - Max value for each parameter
-maxtemp<- max(ysi$temp)
-maxdo<-max(ysi$do_mgl)
-maxchlor<-max(ysi$chlor_rfu)
-maxbga<-max(ysi$bga_rfu)
+maxtemp_org<- quantile(na.omit(ysi$temp),0.95)
+maxdo_org<-quantile(na.omit(ysi$do_mgl),0.95)
+maxchlor_org<-quantile(na.omit(ysi$chlor_rfu),0.95)
+maxbga_org<-quantile(na.omit(ysi$bga_rfu),0.95)
 
 ##Generate a pdf for each lake in the dataset
 for (i in 1:dim(samples)[1]){
@@ -39,6 +39,11 @@ dt<-samples$date[i]
 
 s<-ysi[which(ysi$awq==st&ysi$date==dt),]
 s<-s[order(s$depth),]
+
+maxtemp<- ifelse(max(na.omit(s$temp))>maxtemp,max(na.omit(s$temp)),maxtemp_org)
+maxdo<-ifelse(max(na.omit(s$do_mgl))>maxdo,max(na.omit(s$do_mgl)),maxdo_org)
+maxchlor<-ifelse(max(na.omit(s$chlor_rfu))>maxchlor,max(na.omit(s$chlor_rfu)),maxchlor_org)
+maxbga<-ifelse(max(na.omit(s$bga_rfu)),max(na.omit(s$bga_rfu)),maxbga_org)
 
 p1<-  ggplot(s,aes(temp,depth))+
         geom_path(size=1.5)+
@@ -139,21 +144,22 @@ ggsave(paste0("ysipdf/",st,lakemappt$name,gsub('/','-',dt),"ysi.pdf"),laketest,w
 
 ##Combine site pdfs for interactive map
 
-lf<-as.data.frame(list.files("ysipdf"))
+lf<-as.data.frame(list.files("ysipdf",pattern = "\\.pdf$"))
 lf$sid<-substr(lf[,1],1,5)
 lf$cnt<-1
+colnames(lf)[1] <- 'fName'
 cntpdf<-aggregate(lf[c("cnt")],by=lf[c("sid")],sum)
 
 for (i in 1:dim(cntpdf)[1]){
   if (cntpdf[i,2]>1){
     pdfjoin<-lf[lf$sid==cntpdf[i,1],]
-    pdfjoin$file<-paste0("ysipdf/",pdfjoin$`list.files("ysipdf")`)
+    pdfjoin$file<-paste0("ysipdf/",pdfjoin$fName)
     pdf_combine(pdfjoin[,4],paste0('ysipdf/bysite/',pdfjoin[1,2],'.pdf'))
   }
   
   if (cntpdf[i,2]==1){
     pdf<-lf[lf$sid==cntpdf[i,1],]
-    pdf$file<-paste0("ysipdf/",pdf$`list.files("ysipdf")`)
+    pdf$file<-paste0("ysipdf/",pdf$fName)
     file.copy(pdf$file,paste0('ysipdf/bysite/',pdf$sid,'.pdf'))
   }
 }
