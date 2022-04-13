@@ -7,3 +7,5 @@ Plot YSI lakes cast. pdf Report.
 ## Sediment Diatom Sites Exploratory Analysis
 
 https://marybecker.github.io/Lakes/sediment_diatom_site_selection.html
+
+https://marybecker.github.io/Lakes/SedimentDiatoms/index.html
